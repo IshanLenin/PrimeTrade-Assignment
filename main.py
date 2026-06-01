@@ -5,10 +5,19 @@ import models, schemas, auth, database
 from typing import List
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
+from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Prime Trade / Backend Intern API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # This tells FastAPI where to look for the token (the 'login' route)
@@ -47,7 +56,7 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_d
     
     # 2. Hash the password and save the user
     hashed_password = auth.get_password_hash(user.password)
-    new_user = models.User(name=user.name, email=user.email, hashed_password=hashed_password, role="admin")
+    new_user = models.User(email=user.email, hashed_password=hashed_password, role="admin")
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
