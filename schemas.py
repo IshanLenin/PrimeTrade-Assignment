@@ -7,7 +7,9 @@ class TaskBase(BaseModel):
     description: Optional[str] = None
 
 class TaskCreate(TaskBase):
-    pass
+    task_id: Optional[int] = None
+    description: str = Field(min_length=1)
+    owner_id: Optional[int] = None
 
 class TaskResponse(TaskBase):
     id: int
@@ -16,18 +18,28 @@ class TaskResponse(TaskBase):
     class Config:
         from_attributes = True  # Allows Pydantic to read SQLAlchemy models
 
+class TaskUpdate(TaskBase):
+    title: Optional[str]
+    description: Optional[str]
+    owner_id: Optional[int]
+    
+    class Config:
+        from_attributes = True
+
+
 # --- User Schemas ---
 class UserCreate(BaseModel):
     name:str
     email: EmailStr
     password: str = Field(min_length=8, max_length=72)
     #bcrypt only accepts upto 72 bytes of string
+    role: Optional[str]
 
 class UserResponse(BaseModel):
     id: int
     name:str
     email: EmailStr
-    role: str
+    role: str 
 
     class Config:
         from_attributes = True
