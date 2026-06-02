@@ -40,7 +40,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     
      # 3. Generate JWT Token (embedding the user ID and role inside the token)
     access_token = config.create_access_token(
-        data={"sub": str(user.id), "role": user.role}
+        data={"sub": user.email, "role": user.role}
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

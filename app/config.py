@@ -14,7 +14,7 @@ SECRET_KEY = "password@123"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# Tell Passlib to use the bcrypt algorithm
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") 
 #deprecated means if a password that was hashed with a previous version is given, it will still be verified and updated to the latest version
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -26,16 +26,21 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        # 1. Decode the token payload
+        # Decode the token payload
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        
+        print(f"--- THE DECODED PAYLOAD IS: {payload} ---") # <--- ADD THIS
+        
         email: str = payload.get("sub")
         if email is None:
+            print("--- CRASH: COULD NOT FIND 'sub' ---") # <--- ADD THIS
             raise credentials_exception
-            
-        # 2. Map payload data to your Pydantic validation schema token bucket
+        print(f"--- THE EMAIL IS: {email} ---")
+        
         token_data = user_schemas.TokenData(email=email) 
         
-    except JWTError:
+    except JWTError as e:
+        print(f"--- JWT ERROR CRASH: {e} ---") # <--- ADD THIS
         raise credentials_exception
 
     # 3. Query your database using your explicit SQLAlchemy Table namespace

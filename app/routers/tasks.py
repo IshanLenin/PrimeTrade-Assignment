@@ -10,7 +10,7 @@ router = APIRouter(
     tags=["Tasks"]
 )
 
-@router.post("/", response_model=schemas.TaskResponse)
+@router.post("", response_model=schemas.TaskResponse)
 def create_task(
     task: schemas.TaskCreate, 
     db: Session = Depends(database.get_db),
@@ -27,7 +27,7 @@ def create_task(
     db.refresh(new_task)
     return new_task
 
-@router.get("/", response_model=List[schemas.TaskResponse])
+@router.get("", response_model=List[schemas.TaskResponse])
 def read_tasks(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Fetch only the tasks belonging to the logged-in user
     tasks = db.query(models.Task).filter(models.Task.owner_id == current_user.id).all()
@@ -39,21 +39,17 @@ def update_task(task_id: int, task_update: schemas.TaskUpdate, db: Session = Dep
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
 
     if not task:
-        return HTTPException(status_code=404,detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task not found")
     
-    if task.owner_id != current_user and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail= "Not authorized to assign tasks")
+    if task.owner_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to assign tasks")
 
-    new_task = models.Task(
-        title=task_update.title,
-        description=task_update.description,
-        owner_id=task_update.owner_id
-    )
+    task.title = task_update.title
+    task.description = task_update.description
 
-    db.add(new_task)
     db.commit()
-    db.refresh(new_task)
-    return new_task
+    db.refresh(task)
+    return task
 
 @router.delete("/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):

@@ -155,7 +155,7 @@
                 formData.append("username", email);
                 formData.append("password", password);
 
-                const response = await fetch(`${API_URL}/auth/login/`, {
+                const response = await fetch(`${API_URL}/auth/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: formData
@@ -193,7 +193,7 @@
             taskListContainer.innerHTML = "<div class='text-gray-600 text-center py-4'>Loading tasks...</div>";
 
             try {
-                const response = await fetch(`${API_URL}/tasks/`, {
+                const response = await fetch(`${API_URL}/tasks`, {
                     method: "GET",
                     headers: { "Authorization": `Bearer ${token}` }
                 });
@@ -297,7 +297,7 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/tasks/`, {
+                const response = await fetch(`${API_URL}/tasks`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
