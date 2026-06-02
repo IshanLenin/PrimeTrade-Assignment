@@ -21,7 +21,6 @@ class TaskResponse(TaskBase):
 class TaskUpdate(TaskBase):
     title: Optional[str]
     description: Optional[str]
-    owner_id: Optional[int]
     
     class Config:
         from_attributes = True

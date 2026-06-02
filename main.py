@@ -169,8 +169,6 @@ def update_task(
         task.title = update_data["title"]
     if update_data["description"] is not None:
         task.description = update_data["description"]
-    if update_data["owner_id"] is not None:
-        task.owner_id = update_data["owner_id"]
 
     db.commit()
     db.refresh(task)
