@@ -8,12 +8,14 @@ from sqlalchemy.orm import Session
 from .schemas import users as user_schemas
 from .models import users as user_models
 from .database import get_db
+from dotenv import load_dotenv
+import os
 
-# These must be stored in a .env file, but for the sake of the assessment I have included them in the main file.
-SECRET_KEY = "password@123" 
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+load_dotenv()
 
+SECRET_KEY = os.getenv("SECRET_KEY") 
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") 
 #deprecated means if a password that was hashed with a previous version is given, it will still be verified and updated to the latest version
@@ -36,7 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             print("--- CRASH: COULD NOT FIND 'sub' ---") # <--- ADD THIS
             raise credentials_exception
         print(f"--- THE EMAIL IS: {email} ---")
-        
+
         token_data = user_schemas.TokenData(email=email) 
         
     except JWTError as e:
